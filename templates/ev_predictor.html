@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="main">
+  <div class="page-layout">
+
+    <!-- LEFT: Form -->
+    <div class="card">
+      <h2>EV price predictor</h2>
+      <p class="sub">New EV market prices (German dataset · 306 models)</p>
+
+      <form id="fairForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Battery (kWh): <span id="batteryVal">50</span> kWh</label>
+            <input type="range" id="battery" name="battery" min="10" max="150" step="1" value="50"
+              oninput="batteryVal.innerText = this.value">
+          </div>
+          <div class="form-group">
+  <label>Efficiency (Wh/km): <span id="effVal">209</span> Wh/km</label>
+  <input type="range" id="efficiency" name="efficiency" min="50" max="400" step="1" value="209"
+    oninput="effVal.innerText = this.value">
+</div>
+
+<div class="form-group">
+  <label>Fast Charge (km/h): <span id="fcVal">660</span> km/h</label>
+  <input type="range" id="fast_charge" name="fast_charge" min="0" max="1000" step="10" value="660"
+    oninput="fcVal.innerText = this.value">
+</div>
+          <div class="form-group">
+            <label>Range (km): <span id="rangeVal">400</span> km</label>
+            <input type="range" id="range" name="range" min="50" max="1000" step="5" value="400"
+              oninput="rangeVal.innerText = this.value">
+          </div>
+          <div class="form-group">
+            <label>Top Speed (km/h): <span id="topSpeedVal">200</span> km/h</label>
+            <input type="range" id="top_speed" name="top_speed" min="100" max="400" step="5" value="200"
+              oninput="topSpeedVal.innerText = this.value">
+          </div>
+          <div class="form-group">
+            <label>0–100 km/h (s): <span id="accVal">8</span> s</label>
+            <input type="range" id="acceleration__0_100_" name="acceleration__0_100_" min="2" max="15"
+              step="0.1" value="8" oninput="accVal.innerText = this.value">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Brand</label>
+          <select name="brand" required>
+            <option value="">Select Brand</option>
+            <option>Tesla</option><option>BYD</option><option>MG</option>
+            <option>BMW</option><option>Volvo</option><option>Citroen</option>
+            <option>Renault</option><option>Hyundai</option><option>Kia</option>
+            <option>Fiat</option><option>CUPRA</option><option>Dacia</option>
+            <option>Opel</option><option>Toyota</option><option>Smart</option>
+            <option>Volkswagen</option><option>Audi</option><option>Skoda</option>
+            <option>Peugeot</option><option>Mini</option><option>Jeep</option>
+            <option>Nissan</option><option>Zeekr</option><option>Lucid</option>
+            <option>Honda</option><option>Lotus</option><option>Polestar</option>
+            <option>Subaru</option><option>Mercedes</option><option>Fisker</option>
+            <option>Mazda</option><option>Maxus</option><option>Lexus</option>
+            <option>Ford</option><option>ORA</option><option>NIO</option>
+            <option>VinFast</option><option>Jaguar</option><option>SsangYong</option>
+            <option>Aiways</option><option>Porsche</option><option>DS</option>
+            <option>Genesis</option><option>e.Go</option><option>Elaris</option>
+            <option>Abarth</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Drive Type</label>
+          <select name="drive_type" required>
+            <option value="">Select Drive Type</option>
+            <option>unknown</option><option>AWD</option>
+            <option>FWD</option><option>RWD</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Variant</label>
+          <select name="variant" required>
+            <option value="">Select Variant</option>
+            <option>long range</option><option>standard</option>
+            <option>excellence</option><option>performance</option>
+            <option>plaid</option><option>m50</option><option>pro</option>
+            <option>design</option><option>gt</option><option>dream edition</option>
+            <option>brabus</option><option>m60</option><option>ultra</option>
+            <option>extreme</option><option>pro s</option><option>grand touring</option>
+            <option>rs</option><option>touring</option><option>gtx</option>
+            <option>m70</option><option>amg</option>
+          </select>
+        </div>
+
+        <button type="submit">Predict Price</button>
+      </form>
+    </div>
+
+    <!-- RIGHT: Result panel (always visible) -->
+    <div class="result-panel" id="result">
+      <div class="result-placeholder" id="placeholder">
+        <div class="placeholder-icon">⚡</div>
+        <p>Fill in the form on the left and click <strong>Predict Price</strong> to see the estimated market value.</p>
+      </div>
+      <div class="result-content hidden" id="resultContent">
+        <div class="label">Our model says</div>
+        <div class="predicted-price" id="fairPrice">€ — {{ result }}</div>
+        <div class="price-sub">{{lower_range}} - {{upper_range}}</div>
+        <hr />
+        <div class="spec-summary" id="specSummary"></div>
+
+
+        <button type="button" id="indianBtn">Indian Price</button>
+<div class="predicted-price hidden" id="indianPrice"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  .page-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .result-panel {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 2rem;
+    background: var(--card);
+    position: sticky;
+    top: 2rem;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .result-placeholder {
+    text-align: center;
+    color: var(--muted);
+  }
+
+  .placeholder-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    opacity: 0.4;
+  }
+
+  .result-placeholder p {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    max-width: 220px;
+    margin: 0 auto;
+  }
+
+  .result-content {
+    width: 100%;
+  }
+
+  .result-content .label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+  }
+
+  .predicted-price {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.75rem;
+    color: var(--green);
+    line-height: 1;
+    margin-bottom: 0.35rem;
+  }
+  .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;  /* 2 sliders per row */
+  gap: 1rem;
+}
+
+  .price-sub {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 1.25rem;
+  }
+
+  .result-content hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin-bottom: 1.25rem;
+  }
+
+  .spec-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .spec-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+  }
+.main { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+
+.page-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+  width: 100%;
+}
+
+  .spec-row span:first-child { color: var(--muted); }
+  .spec-row span:last-child { font-weight: 600; }
+
+  .hidden { display: none; }
+
+  @media (max-width: 700px) {
+    .page-layout { grid-template-columns: 1fr; }
+    .result-panel { position: static; }
+  }
+</style>
+
+<script>
+  document.getElementById('fairForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    // grab values
+    const battery   = document.getElementById('battery').value;
+    const range     = document.getElementById('range').value;
+    const topSpeed  = document.getElementById('top_speed').value;
+    const acc       = document.getElementById('acceleration__0_100_').value;
+    const efficiency = document.getElementById('efficiency').value;
+const fast_charge = document.getElementById('fast_charge').value;
+    const brand     = this.brand.value;
+    const drive     = this.drive_type.value;
+    const variant   = this.variant.value;
+
+    // placeholder price calc — replace with real ML call
+    const estimated = Math.round((battery * 800) + (range * 20) + (topSpeed * 50));
+
+    // show result
+    document.getElementById('placeholder').classList.add('hidden');
+    document.getElementById('resultContent').classList.remove('hidden');
+    document.getElementById('fairPrice').textContent = '€ ' + estimated.toLocaleString('en-EU');
+
+    document.getElementById('specSummary').innerHTML = `
+      <div class="spec-row"><span>Brand</span><span>${brand} · ${variant}</span></div>
+      <div class="spec-row"><span>Efficiency</span><span>${efficiency}</span></div>
+      <div class="spec-row"><span>Fast Charge</span><span>${fast_charge}</span></div>
+      <div class="spec-row"><span>Drive Type</span><span>${drive}</span></div>
+      <div class="spec-row"><span>Battery</span><span>${battery} kWh</span></div>
+      <div class="spec-row"><span>Range</span><span>${range} km</span></div>
+      <div class="spec-row"><span>Top Speed</span><span>${topSpeed} km/h</span></div>
+      <div class="spec-row"><span>0–100</span><span>${acc} s</span></div>
+    `;
+  });
+</script>
+<script>
+const indianBtn = document.getElementById('indianBtn');
+const indianPriceDiv = document.getElementById('indianPrice');
+
+indianBtn.addEventListener('click', () => {
+    const euroPriceText = document.getElementById('fairPrice').textContent.replace(/[^\d]/g, '');
+    const euroPrice = parseFloat(euroPriceText);
+    const inrPrice = Math.round(euroPrice * 91.5);
+    indianPriceDiv.textContent = '₹ ' + inrPrice.toLocaleString('en-IN');
+    indianPriceDiv.classList.remove('hidden');
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,568 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .main {
+        max-width: 1200px !important;
+        /* override base CSS */
+        margin: 2rem auto;
+        padding: 0 2rem;
+    }
+
+    .page-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        align-items: start;
+    }
+
+    @media (max-width: 768px) {
+        .page-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+      .page-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .result-panel {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 2rem;
+    background: var(--card);
+    position: sticky;
+    top: 2rem;
+    min-height: 300px;
+    
+    align-items: center;
+    justify-content: center;
+  }
+
+  .result-placeholder {
+    text-align: center;
+    color: var(--muted);
+  }
+
+  .placeholder-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    opacity: 0.4;
+  }
+
+  .result-placeholder p {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    max-width: 220px;
+    margin: 0 auto;
+  }
+
+  .result-content {
+    width: 100%;
+  }
+
+  .result-content .label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+  }
+
+  .predicted-price {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.75rem;
+    color: var(--green);
+    line-height: 1;
+    margin-bottom: 0.35rem;
+  }
+  .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;  /* 2 sliders per row */
+  gap: 1rem;
+}
+
+  .price-sub {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 1.25rem;
+  }
+
+  .result-content hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin-bottom: 1.25rem;
+  }
+
+  .spec-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .spec-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+  }
+.main { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+
+.page-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+  width: 100%;
+}
+
+  .spec-row span:first-child { color: var(--muted); }
+  .spec-row span:last-child { font-weight: 600; }
+
+  .hidden { display: none; }
+
+  @media (max-width: 700px) {
+    .page-layout { grid-template-columns: 1fr; }
+    .result-panel { position: static; }
+  }
+</style>
+<div class="main">
+    <div class="page-layout">
+
+        <!-- LEFT: Form -->
+        <div class="card">
+            <h2>Resale Estimator</h2>
+            <p class="sub">Don't know what price to sell at? We got you.</p>
+            <p>Select your vehicle type, fill in the details, and click <strong>Predict Resale Price</strong>.</p>
+ 
+
+            <!-- Toggle -->
+            <div class="toggle-row">
+                <button type="button" class="toggle-btn active" id="btnCar" onclick="switchTo('car')">🚗 Car</button>
+                <button type="button" class="toggle-btn" id="btnBike" onclick="switchTo('bike')">🏍️ Bike</button>
+            </div>
+
+            <!-- CAR FORM -->
+            <form id="carForm" class="vehicle-form" method="POST" action="{{ url_for('resale_price') }}">
+                <input type="hidden" name="vehicle_type" value="car">
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>Brand</label>
+                        <select name="brand" required>
+    <option value="">Select Brand</option>
+    <option>Maruti</option>
+    <option>Hyundai</option>
+    <option>Ford</option>
+    <option>Renault</option>
+    <option>Mini</option>
+    <option>Mercedes-Benz</option>
+    <option>Toyota</option>
+    <option>Volkswagen</option>
+    <option>Honda</option>
+    <option>Mahindra</option>
+    <option>Datsun</option>
+    <option>Tata</option>
+    <option>Kia</option>
+    <option>BMW</option>
+    <option>Audi</option>
+    <option>Land Rover</option>
+    <option>Jaguar</option>
+    <option>MG</option>
+    <option>Isuzu</option>
+    <option>Porsche</option>
+    <option>Skoda</option>
+    <option>Volvo</option>
+    <option>Lexus</option>
+    <option>Jeep</option>
+    <option>Maserati</option>
+    <option>Bentley</option>
+    <option>Nissan</option>
+    <option>ISUZU</option>
+    <option>Ferrari</option>
+    <option>Mercedes-AMG</option>
+    <option>Rolls-Royce</option>
+    <option>Force</option>
+</select>
+                    </div>
+                    <div class="form-group">
+                        <label>Model Name</label>
+                        <select name="model" required>
+    <option value="">Select Model</option>
+    <option>Alto</option>
+    <option>Grand</option>
+    <option>i20</option>
+    <option>Ecosport</option>
+    <option>Wagon R</option>
+    <option>i10</option>
+    <option>Venue</option>
+    <option>Swift</option>
+    <option>Verna</option>
+    <option>Duster</option>
+    <option>Cooper</option>
+    <option>Ciaz</option>
+    <option>C-Class</option>
+    <option>Innova</option>
+    <option>Baleno</option>
+    <option>Swift Dzire</option>
+    <option>Vento</option>
+    <option>Creta</option>
+    <option>City</option>
+    <option>Bolero</option>
+    <option>Fortuner</option>
+    <option>KWID</option>
+    <option>Amaze</option>
+    <option>Santro</option>
+    <option>XUV500</option>
+    <option>KUV100</option>
+    <option>Ignis</option>
+    <option>RediGO</option>
+    <option>Scorpio</option>
+    <option>Marazzo</option>
+    <option>Aspire</option>
+    <option>Figo</option>
+    <option>Vitara</option>
+    <option>Tiago</option>
+    <option>Polo</option>
+    <option>Seltos</option>
+    <option>Celerio</option>
+    <option>GO</option>
+    <option>5</option>
+    <option>CR-V</option>
+    <option>Endeavour</option>
+    <option>KUV</option>
+    <option>Jazz</option>
+    <option>3</option>
+    <option>A4</option>
+    <option>Tigor</option>
+    <option>Ertiga</option>
+    <option>Safari</option>
+    <option>Thar</option>
+    <option>Hexa</option>
+    <option>Rover</option>
+    <option>Eeco</option>
+    <option>A6</option>
+    <option>E-Class</option>
+    <option>Q7</option>
+    <option>Z4</option>
+    <option>6</option>
+    <option>XF</option>
+    <option>X5</option>
+    <option>Hector</option>
+    <option>Civic</option>
+    <option>D-Max</option>
+    <option>Cayenne</option>
+    <option>X1</option>
+    <option>Rapid</option>
+    <option>Freestyle</option>
+    <option>Superb</option>
+    <option>Nexon</option>
+    <option>XUV300</option>
+    <option>Dzire VXI</option>
+    <option>S90</option>
+    <option>WR-V</option>
+    <option>XL6</option>
+    <option>Triber</option>
+    <option>ES</option>
+    <option>Wrangler</option>
+    <option>Camry</option>
+    <option>Elantra</option>
+    <option>Yaris</option>
+    <option>GL-Class</option>
+    <option>7</option>
+    <option>S-Presso</option>
+    <option>Dzire LXI</option>
+    <option>Aura</option>
+    <option>XC</option>
+    <option>Ghibli</option>
+    <option>Continental</option>
+    <option>CR</option>
+    <option>Kicks</option>
+    <option>S-Class</option>
+    <option>Tucson</option>
+    <option>Harrier</option>
+    <option>X3</option>
+    <option>Octavia</option>
+    <option>Compass</option>
+    <option>CLS</option>
+    <option>redi-GO</option>
+    <option>Glanza</option>
+    <option>Macan</option>
+    <option>X4</option>
+    <option>Dzire ZXI</option>
+    <option>XC90</option>
+    <option>F-PACE</option>
+    <option>A8</option>
+    <option>MUX</option>
+    <option>GTC4Lusso</option>
+    <option>GLS</option>
+    <option>X-Trail</option>
+    <option>XE</option>
+    <option>XC60</option>
+    <option>Panamera</option>
+    <option>Alturas</option>
+    <option>Altroz</option>
+    <option>NX</option>
+    <option>Carnival</option>
+    <option>C</option>
+    <option>RX</option>
+    <option>Ghost</option>
+    <option>Quattroporte</option>
+    <option>Gurkha</option>
+</select>
+                    </div>
+                </div>
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>Fuel Type</label>
+                        <select name="fuel_type" required>
+                            <option value="">Select Fuel</option>
+                            <option>Petrol</option>
+                            <option>Diesel</option>
+                            <option>CNG</option>
+                            <option>LPG</option>
+                            <option>Electric</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Transmission Type</label>
+                        <select name="transmission_type" required>
+                            <option value="">Select</option>
+                            <option>Manual</option>
+                            <option>Automatic</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Seller Type</label>
+                    <select name="seller_type" required>
+                        <option value="">Select Seller Type</option>
+                        <option>Individual</option>
+                        <option>Dealer</option>
+                        <option>Trustmark Dealer</option>
+                    </select>
+                </div>
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>Vehicle Age (years): <span id="carAgeVal">5</span></label>
+                        <input type="range" name="vehicle_age" min="0" max="30" step="1" value="5"
+                            oninput="carAgeVal.innerText = this.value">
+                    </div>
+                    <div class="form-group">
+                        <label>KM Driven: <span id="kmVal">20,000</span></label>
+                        <input type="range" name="km_driven" min="0" max="300000" step="1000" value="20000"
+                            oninput="kmVal.innerText = parseInt(this.value).toLocaleString('en-IN')">
+                    </div>
+                </div>
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>Mileage (km/l): <span id="mileageVal">18</span></label>
+                        <input type="range" name="mileage" min="0" max="50" step="0.5" value="18"
+                            oninput="mileageVal.innerText = this.value">
+                    </div>
+                    <div class="form-group">
+                        <label>Engine (CC): <span id="engineVal">1200</span></label>
+                        <input type="range" name="engine" min="500" max="5000" step="50" value="1200"
+                            oninput="engineVal.innerText = this.value">
+                    </div>
+                </div>
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>Max Power : <span id="powerVal">80</span></label>
+                        <input type="range" name="max_power" min="30" max="1000" step="1" value="80"
+                            oninput="powerVal.innerText = this.value">
+                    </div>
+                    <div class="form-group">
+                        <label>Seats: <span id="seatsVal">5</span></label>
+                        <input type="range" name="seats" min="2" max="12" step="1" value="5"
+                            oninput="seatsVal.innerText = this.value">
+                    </div>
+                </div>
+
+                <button type="submit">Predict Resale Price</button>
+            </form>
+
+            <!-- BIKE FORM -->
+            <form id="bikeForm" class="vehicle-form hidden" method="POST" action="{{ url_for('resale_price') }}">
+                <input type="hidden" name="vehicle_type" value="bike">
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>Brand</label>
+                        <select name="brand" required>
+                            <option value="">Select Brand</option>
+    <option>TVS</option>
+    <option>Royal Enfield</option>
+    <option>Triumph</option>
+    <option>Yamaha</option>
+    <option>Honda</option>
+    <option>Hero</option>
+    <option>Bajaj</option>
+    <option>Suzuki</option>
+    <option>Benelli</option>
+    <option>KTM</option>
+    <option>Mahindra</option>
+    <option>Kawasaki</option>
+    <option>Ducati</option>
+    <option>Hyosung</option>
+    <option>Harley-Davidson</option>
+    <option>Jawa</option>
+    <option>BMW</option>
+    <option>Indian</option>
+    <option>Rajdoot</option>
+    <option>LML</option>
+    <option>Yezdi</option>
+    <option>MV</option>
+    <option>Ideal</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Owner Type</label>
+                        <select name="owner" required>
+                            <option value="">Select Owner</option>
+                            <option>First Owner</option>
+                            <option>Second Owner</option>
+                            <option>Third Owner</option>
+                            <option>Fourth Owner or More</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>City</label>
+                    <select name="city" required>
+                    <option value="">Select City</option>
+    <option>Ahmedabad</option>
+    <option>Delhi</option>
+    <option>Bangalore</option>
+    <option>Mumbai</option>
+    <option>Kalyan</option>
+    <option>Faridabad</option>
+    <option>Hyderabad</option>
+    <option>Gurgaon</option>
+    <option>Pune</option>
+    <option>Noida</option>
+    <option>Nashik</option>
+    <option>Kochi</option>
+    <option>Lucknow</option>
+    <option>Jaipur</option>
+    <option>Agra</option>
+    <option>Vadodara</option>
+    <option>Surat</option>
+    <option>Chennai</option>
+    <option>Navi Mumbai</option>
+    <option>Visakhapatnam</option>
+    <option>Kolkata</option>
+    <option>Ghaziabad</option>
+    <option>Bhubaneswar</option>
+    <option>Amritsar</option>
+    <option>Bhopal</option>
+    <option>Ludhiana</option>
+    <option>Aurangabad</option>
+    <option>Kanpur</option>
+    <option>Meerut</option>
+    <option>Chandigarh</option>
+    <option>Ranchi</option>
+    <option>Thane</option>
+    <option>Jabalpur</option>
+    <option>Kota</option>
+    <option>Rajkot</option>
+    <option>Varanasi</option>
+    <option>Nagpur</option>
+    <option>Coimbatore</option>
+    <option>Mysore</option>
+    <option>Bikaner</option>
+    <option>Jammu</option>
+    <option>Kolhapur</option>
+    <option>Satara</option>
+    <option>Madurai</option>
+    <option>Ujjain</option>
+    <option>Panchkula</option>
+    <option>Jhansi</option>
+    <option>Sonipat</option>
+    <option>Durgapur</option>
+    <option>Howrah</option>
+    <option>Panipat</option>
+    <option>Vellore</option>
+    <option>Ambala</option>
+    <option>Guwahati</option>
+    <option>Gangtok</option>
+    <option>Tiruchirappalli</option>
+    <option>Belgaum</option>
+    <option>Asansol</option>
+    <option>Bilaspur</option>
+    <option>Thanjavur</option>
+    <option>Aligarh</option>
+    <option>Ratnagiri</option>
+    <option>Haldwani</option>
+    <option>Thiruvananthapuram</option>
+    <option>Indore</option>
+    <option>Alappuzha</option>
+    <option>Bhiwandi</option>
+    <option>Shillong</option>
+    <option>Osmanabad</option>
+    <option>Uran</option>
+    <option>Jaunpur</option>
+    <option>Hisar</option>
+    <option>Bhubaneswar</option>
+    <option>Bhilai Nagar</option>
+    <option>Anantnag</option>
+    <option>Silvasa</option></select>
+                </div>
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>Bike Age (years): <span id="bikeAgeVal">3</span></label>
+                        <input type="range" name="age" min="0" max="30" step="1" value="3"
+                            oninput="bikeAgeVal.innerText = this.value">
+                    </div>
+                    <div class="form-group">
+                        <label>KM Driven: <span id="bikeKmVal">15,000</span></label>
+                        <input type="range" name="kms_driven" min="0" max="300000" step="1000" value="15000"
+                            oninput="bikeKmVal.innerText = parseInt(this.value).toLocaleString('en-IN')">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Engine Power (CC): <span id="bikePowerVal">110</span></label>
+                    <input type="range" name="power" min="50" max="2000" step="10" value="110"
+                        oninput="bikePowerVal.innerText = this.value">
+                </div>
+
+                <button type="submit">Predict Resale Price</button>
+            </form>
+        </div>
+
+
+
+        <div class="result-panel" id="result">
+            <div class="result-placeholder" id="placeholder">
+                
+            <div class="result-content" id="resultContent">
+                {% if res %}
+                <div class="label">Estimated resale value</div>
+                <div class="predicted-price" id="fairPrice">₹ {{ "{:,.0f}".format(res) }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<script>
+    function switchTo(type) {
+        document.getElementById('carForm').classList.toggle('hidden', type !== 'car');
+        document.getElementById('bikeForm').classList.toggle('hidden', type !== 'bike');
+    }
+</script>
+<script>
+    // on page load, restore active tab if result came back
+    const activeType = "{{ vehicle_type if vehicle_type else 'car' }}";
+    switchTo(activeType);
+
+    function switchTo(type) {
+        document.getElementById('carForm').classList.toggle('hidden', type !== 'car');
+        document.getElementById('bikeForm').classList.toggle('hidden', type !== 'bike');
+        document.getElementById('btnCar').classList.toggle('active', type === 'car');
+        document.getElementById('btnBike').classList.toggle('active', type === 'bike');
+    }
+</script>
+{% endblock %}

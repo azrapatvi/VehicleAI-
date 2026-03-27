@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="hero">
+  <div class="badge">3 ML models · Used cars · Used bikes · EV prices</div>
+  <h1>One place to predict <span>any vehicle price</span></h1>
+  <p>Whether you're buying a used car, selling a bike, or going electric — get an ML-powered price estimate instantly.</p>
+</section>
+
+
+<div class="cards">
+  <div class="card card-blue-border">
+    <span class="card-badge badge-blue">Used car</span>
+    <h3>Used Car Predictor</h3>
+    <p>Predict resale price from brand, year, km driven, fuel type</p>
+  </div>
+  <div class="card card-red-border">
+    <span class="card-badge badge-red">Used bike</span>
+    <h3>Used Bike Predictor</h3>
+    <p>Predict resale price from cc, brand, age, condition</p>
+  </div>
+  <div class="card card-green-border">
+    <span class="card-badge badge-green">New EV</span>
+    <h3>EV Price Predictor</h3>
+    <p>Predict new EV market price from battery, range, specs</p>
+  </div>
+</div>
+
+<div class="section-label">Special Tools</div>
+<div class="tools">
+  <div class="tool-card">
+    <h4>Fair price check</h4>
+    <p>Is this deal good?</p>
+  </div>
+  <div class="tool-card">
+    <h4>Odometer alert</h4>
+    <p>Detect km fraud</p>
+  </div>
+  <div class="tool-card">
+    <h4>New vs Used</h4>
+    <p>EV vs used car value</p>
+  </div>
+  <div class="tool-card">
+    <h4>Depreciation</h4>
+    <p>Value over years</p>
+  </div>
+</div>
+
+{% endblock %}

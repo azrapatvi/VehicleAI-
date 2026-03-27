@@ -1,0 +1,597 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+  .main { max-width: 600px; margin: 2rem auto; padding: 0 2rem; }
+  .field-group { display: none; }
+  .hidden { display: none; }
+  .result-panel {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 2rem;
+  background: var(--card);
+  margin-top: 1.5rem;
+}
+
+.verdict {
+  margin-top: 1rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.05);
+}
+
+.predicted-price {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-top: 0.25rem;
+}
+
+.result-panel label {
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+}
+</style>
+
+<div class="main">
+  <div class="card">
+    <h2>Fair price checker</h2>
+    <p class="sub">Paste a price you saw online — we tell you if it's a good deal</p>
+
+    <form id="fairForm" method="POST" action="{{ url_for('fair_price') }}">
+
+      <!-- Vehicle Type Selector -->
+      <div class="form-group">
+        <label>Vehicle type</label>
+        <select name="vehicle_type" id="vehicleType" required onchange="updateForm()">
+          <option value="">Select type</option>
+          <option value="used_car">Used car</option>
+          <option value="used_bike">Used bike</option>
+          <option value="new_ev">New EV</option>
+        </select>
+      </div>
+
+      <!-- Dynamic fields wrapper -->
+      <div id="dynamicFields" class="hidden">
+
+        <!-- ===== USED CAR FIELDS (from resale_prices.html) ===== -->
+        <div id="fields_used_car" class="field-group">
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Brand</label>
+              <select name="brand">
+                <option value="">Select Brand</option>
+                <option>Maruti</option>
+                <option>Hyundai</option>
+                <option>Ford</option>
+                <option>Renault</option>
+                <option>Mini</option>
+                <option>Mercedes-Benz</option>
+                <option>Toyota</option>
+                <option>Volkswagen</option>
+                <option>Honda</option>
+                <option>Mahindra</option>
+                <option>Datsun</option>
+                <option>Tata</option>
+                <option>Kia</option>
+                <option>BMW</option>
+                <option>Audi</option>
+                <option>Land Rover</option>
+                <option>Jaguar</option>
+                <option>MG</option>
+                <option>Isuzu</option>
+                <option>Porsche</option>
+                <option>Skoda</option>
+                <option>Volvo</option>
+                <option>Lexus</option>
+                <option>Jeep</option>
+                <option>Maserati</option>
+                <option>Bentley</option>
+                <option>Nissan</option>
+                <option>ISUZU</option>
+                <option>Ferrari</option>
+                <option>Mercedes-AMG</option>
+                <option>Rolls-Royce</option>
+                <option>Force</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Model Name</label>
+              <select name="model">
+                <option value="">Select Model</option>
+                <option>Alto</option>
+                <option>Grand</option>
+                <option>i20</option>
+                <option>Ecosport</option>
+                <option>Wagon R</option>
+                <option>i10</option>
+                <option>Venue</option>
+                <option>Swift</option>
+                <option>Verna</option>
+                <option>Duster</option>
+                <option>Cooper</option>
+                <option>Ciaz</option>
+                <option>C-Class</option>
+                <option>Innova</option>
+                <option>Baleno</option>
+                <option>Swift Dzire</option>
+                <option>Vento</option>
+                <option>Creta</option>
+                <option>City</option>
+                <option>Bolero</option>
+                <option>Fortuner</option>
+                <option>KWID</option>
+                <option>Amaze</option>
+                <option>Santro</option>
+                <option>XUV500</option>
+                <option>KUV100</option>
+                <option>Ignis</option>
+                <option>RediGO</option>
+                <option>Scorpio</option>
+                <option>Marazzo</option>
+                <option>Aspire</option>
+                <option>Figo</option>
+                <option>Vitara</option>
+                <option>Tiago</option>
+                <option>Polo</option>
+                <option>Seltos</option>
+                <option>Celerio</option>
+                <option>GO</option>
+                <option>5</option>
+                <option>CR-V</option>
+                <option>Endeavour</option>
+                <option>KUV</option>
+                <option>Jazz</option>
+                <option>3</option>
+                <option>A4</option>
+                <option>Tigor</option>
+                <option>Ertiga</option>
+                <option>Safari</option>
+                <option>Thar</option>
+                <option>Hexa</option>
+                <option>Rover</option>
+                <option>Eeco</option>
+                <option>A6</option>
+                <option>E-Class</option>
+                <option>Q7</option>
+                <option>Z4</option>
+                <option>6</option>
+                <option>XF</option>
+                <option>X5</option>
+                <option>Hector</option>
+                <option>Civic</option>
+                <option>D-Max</option>
+                <option>Cayenne</option>
+                <option>X1</option>
+                <option>Rapid</option>
+                <option>Freestyle</option>
+                <option>Superb</option>
+                <option>Nexon</option>
+                <option>XUV300</option>
+                <option>Dzire VXI</option>
+                <option>S90</option>
+                <option>WR-V</option>
+                <option>XL6</option>
+                <option>Triber</option>
+                <option>ES</option>
+                <option>Wrangler</option>
+                <option>Camry</option>
+                <option>Elantra</option>
+                <option>Yaris</option>
+                <option>GL-Class</option>
+                <option>7</option>
+                <option>S-Presso</option>
+                <option>Dzire LXI</option>
+                <option>Aura</option>
+                <option>XC</option>
+                <option>Ghibli</option>
+                <option>Continental</option>
+                <option>CR</option>
+                <option>Kicks</option>
+                <option>S-Class</option>
+                <option>Tucson</option>
+                <option>Harrier</option>
+                <option>X3</option>
+                <option>Octavia</option>
+                <option>Compass</option>
+                <option>CLS</option>
+                <option>redi-GO</option>
+                <option>Glanza</option>
+                <option>Macan</option>
+                <option>X4</option>
+                <option>Dzire ZXI</option>
+                <option>XC90</option>
+                <option>F-PACE</option>
+                <option>A8</option>
+                <option>MUX</option>
+                <option>GTC4Lusso</option>
+                <option>GLS</option>
+                <option>X-Trail</option>
+                <option>XE</option>
+                <option>XC60</option>
+                <option>Panamera</option>
+                <option>Alturas</option>
+                <option>Altroz</option>
+                <option>NX</option>
+                <option>Carnival</option>
+                <option>C</option>
+                <option>RX</option>
+                <option>Ghost</option>
+                <option>Quattroporte</option>
+                <option>Gurkha</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Fuel Type</label>
+              <select name="fuel_type">
+                <option value="">Select Fuel</option>
+                <option>Petrol</option>
+                <option>Diesel</option>
+                <option>CNG</option>
+                <option>LPG</option>
+                <option>Electric</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Transmission Type</label>
+              <select name="transmission_type">
+                <option value="">Select</option>
+                <option>Manual</option>
+                <option>Automatic</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Seller Type</label>
+            <select name="seller_type">
+              <option value="">Select Seller Type</option>
+              <option>Individual</option>
+              <option>Dealer</option>
+              <option>Trustmark Dealer</option>
+            </select>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Vehicle Age (years): <span id="carAgeVal">5</span></label>
+              <input type="range" name="vehicle_age" min="0" max="30" step="1" value="5"
+                oninput="carAgeVal.innerText = this.value">
+            </div>
+            <div class="form-group">
+              <label>KM Driven: <span id="kmVal">20,000</span></label>
+              <input type="range" name="km_driven" min="0" max="300000" step="1000" value="20000"
+                oninput="kmVal.innerText = parseInt(this.value).toLocaleString('en-IN')">
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Mileage (km/l): <span id="mileageVal">18</span></label>
+              <input type="range" name="mileage" min="0" max="50" step="0.5" value="18"
+                oninput="mileageVal.innerText = this.value">
+            </div>
+            <div class="form-group">
+              <label>Engine (CC): <span id="engineVal">1200</span></label>
+              <input type="range" name="engine" min="500" max="5000" step="50" value="1200"
+                oninput="engineVal.innerText = this.value">
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Max Power: <span id="powerVal">80</span></label>
+              <input type="range" name="max_power" min="30" max="1000" step="1" value="80"
+                oninput="powerVal.innerText = this.value">
+            </div>
+            <div class="form-group">
+              <label>Seats: <span id="seatsVal">5</span></label>
+              <input type="range" name="seats" min="2" max="12" step="1" value="5"
+                oninput="seatsVal.innerText = this.value">
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== USED BIKE FIELDS (from resale_prices.html) ===== -->
+        <div id="fields_used_bike" class="field-group">
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Brand</label>
+              <select name="brand">
+                <option value="">Select Brand</option>
+                <option>TVS</option>
+                <option>Royal Enfield</option>
+                <option>Triumph</option>
+                <option>Yamaha</option>
+                <option>Honda</option>
+                <option>Hero</option>
+                <option>Bajaj</option>
+                <option>Suzuki</option>
+                <option>Benelli</option>
+                <option>KTM</option>
+                <option>Mahindra</option>
+                <option>Kawasaki</option>
+                <option>Ducati</option>
+                <option>Hyosung</option>
+                <option>Harley-Davidson</option>
+                <option>Jawa</option>
+                <option>BMW</option>
+                <option>Indian</option>
+                <option>Rajdoot</option>
+                <option>LML</option>
+                <option>Yezdi</option>
+                <option>MV</option>
+                <option>Ideal</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Owner Type</label>
+              <select name="owner">
+                <option value="">Select Owner</option>
+                <option>First Owner</option>
+                <option>Second Owner</option>
+                <option>Third Owner</option>
+                <option>Fourth Owner or More</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>City</label>
+            <select name="city">
+              <option value="">Select City</option>
+              <option>Ahmedabad</option>
+              <option>Delhi</option>
+              <option>Bangalore</option>
+              <option>Mumbai</option>
+              <option>Kalyan</option>
+              <option>Faridabad</option>
+              <option>Hyderabad</option>
+              <option>Gurgaon</option>
+              <option>Pune</option>
+              <option>Noida</option>
+              <option>Nashik</option>
+              <option>Kochi</option>
+              <option>Lucknow</option>
+              <option>Jaipur</option>
+              <option>Agra</option>
+              <option>Vadodara</option>
+              <option>Surat</option>
+              <option>Chennai</option>
+              <option>Navi Mumbai</option>
+              <option>Visakhapatnam</option>
+              <option>Kolkata</option>
+              <option>Ghaziabad</option>
+              <option>Bhubaneswar</option>
+              <option>Amritsar</option>
+              <option>Bhopal</option>
+              <option>Ludhiana</option>
+              <option>Aurangabad</option>
+              <option>Kanpur</option>
+              <option>Meerut</option>
+              <option>Chandigarh</option>
+              <option>Ranchi</option>
+              <option>Thane</option>
+              <option>Jabalpur</option>
+              <option>Kota</option>
+              <option>Rajkot</option>
+              <option>Varanasi</option>
+              <option>Nagpur</option>
+              <option>Coimbatore</option>
+              <option>Mysore</option>
+              <option>Bikaner</option>
+              <option>Jammu</option>
+              <option>Kolhapur</option>
+              <option>Satara</option>
+              <option>Madurai</option>
+              <option>Ujjain</option>
+              <option>Panchkula</option>
+              <option>Jhansi</option>
+              <option>Sonipat</option>
+              <option>Durgapur</option>
+              <option>Howrah</option>
+              <option>Panipat</option>
+              <option>Vellore</option>
+              <option>Ambala</option>
+              <option>Guwahati</option>
+              <option>Gangtok</option>
+              <option>Tiruchirappalli</option>
+              <option>Belgaum</option>
+              <option>Asansol</option>
+              <option>Bilaspur</option>
+              <option>Thanjavur</option>
+              <option>Aligarh</option>
+              <option>Ratnagiri</option>
+              <option>Haldwani</option>
+              <option>Thiruvananthapuram</option>
+              <option>Indore</option>
+              <option>Alappuzha</option>
+              <option>Bhiwandi</option>
+              <option>Shillong</option>
+              <option>Osmanabad</option>
+              <option>Uran</option>
+              <option>Jaunpur</option>
+              <option>Hisar</option>
+              <option>Bhilai Nagar</option>
+              <option>Anantnag</option>
+              <option>Silvasa</option>
+            </select>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Bike Age (years): <span id="bikeAgeVal">3</span></label>
+              <input type="range" name="age" min="0" max="30" step="1" value="3"
+                oninput="bikeAgeVal.innerText = this.value">
+            </div>
+            <div class="form-group">
+              <label>KM Driven: <span id="bikeKmVal">15,000</span></label>
+              <input type="range" name="kms_driven" min="0" max="300000" step="1000" value="15000"
+                oninput="bikeKmVal.innerText = parseInt(this.value).toLocaleString('en-IN')">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Engine Power (CC): <span id="bikePowerVal">110</span></label>
+            <input type="range" name="power" min="50" max="2000" step="10" value="110"
+              oninput="bikePowerVal.innerText = this.value">
+          </div>
+        </div>
+
+        <!-- ===== NEW EV FIELDS (from ev_predictor.html) ===== -->
+        <div id="fields_new_ev" class="field-group">
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Battery (kWh): <span id="batteryVal">50</span> kWh</label>
+              <input type="range" name="battery" min="10" max="150" step="1" value="50"
+                oninput="batteryVal.innerText = this.value">
+            </div>
+            <div class="form-group">
+              <label>Efficiency (Wh/km): <span id="effVal">209</span> Wh/km</label>
+              <input type="range" name="efficiency" min="50" max="400" step="1" value="209"
+                oninput="effVal.innerText = this.value">
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Fast Charge (km/h): <span id="fcVal">660</span> km/h</label>
+              <input type="range" name="fast_charge" min="0" max="1000" step="10" value="660"
+                oninput="fcVal.innerText = this.value">
+            </div>
+            <div class="form-group">
+              <label>Range (km): <span id="rangeVal">400</span> km</label>
+              <input type="range" name="range" min="50" max="1000" step="5" value="400"
+                oninput="rangeVal.innerText = this.value">
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Top Speed (km/h): <span id="topSpeedVal">200</span> km/h</label>
+              <input type="range" name="top_speed" min="100" max="400" step="5" value="200"
+                oninput="topSpeedVal.innerText = this.value">
+            </div>
+            <div class="form-group">
+              <label>0-100 km/h (s): <span id="accVal">8</span> s</label>
+              <input type="range" name="acceleration__0_100_" min="2" max="15" step="0.1" value="8"
+                oninput="accVal.innerText = this.value">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Brand</label>
+            <select name="brand">
+              <option value="">Select Brand</option>
+            <option>Tesla</option><option>BYD</option><option>MG</option>
+            <option>BMW</option><option>Volvo</option><option>Citroen</option>
+            <option>Renault</option><option>Hyundai</option><option>Kia</option>
+            <option>Fiat</option><option>CUPRA</option><option>Dacia</option>
+            <option>Opel</option><option>Toyota</option><option>Smart</option>
+            <option>Volkswagen</option><option>Audi</option><option>Skoda</option>
+            <option>Peugeot</option><option>Mini</option><option>Jeep</option>
+            <option>Nissan</option><option>Zeekr</option><option>Lucid</option>
+            <option>Honda</option><option>Lotus</option><option>Polestar</option>
+            <option>Subaru</option><option>Mercedes</option><option>Fisker</option>
+            <option>Mazda</option><option>Maxus</option><option>Lexus</option>
+            <option>Ford</option><option>ORA</option><option>NIO</option>
+            <option>VinFast</option><option>Jaguar</option><option>SsangYong</option>
+            <option>Aiways</option><option>Porsche</option><option>DS</option>
+            <option>Genesis</option><option>e.Go</option><option>Elaris</option>
+            <option>Abarth</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Drive Type</label>
+            <select name="drive_type">
+              <option value="">Select Drive Type</option>
+              <option>unknown</option>
+              <option>AWD</option>
+              <option>FWD</option>
+              <option>RWD</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Variant</label>
+            <select name="variant">
+              <option value="">Select Variant</option>
+            <option>long range</option><option>standard</option>
+            <option>excellence</option><option>performance</option>
+            <option>plaid</option><option>m50</option><option>pro</option>
+            <option>design</option><option>gt</option><option>dream edition</option>
+            <option>brabus</option><option>m60</option><option>ultra</option>
+            <option>extreme</option><option>pro s</option><option>grand touring</option>
+            <option>rs</option><option>touring</option><option>gtx</option>
+            <option>m70</option><option>amg</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Asking price always shown once type is selected -->
+        <div class="form-group">
+          <label>Asking price (₹)</label>
+          <input type="number" name="asking_price" placeholder="e.g. 450000" required />
+        </div>
+
+        <button type="submit">Check this price</button>
+
+        
+    
+
+
+      </div>
+    </form>
+
+    <!-- Result shown after POST -->
+    {% if res %}
+    <div class="result-panel" style="margin-top: 1.5rem;">
+      <div class="label">Our model says</div>
+      <div class="form-row-2">
+        <div>
+          <label>Fair market price</label>
+          <div class="predicted-price" style="color: var(--green);">₹ {{ "{:,.0f}".format(res) }}</div>
+        </div>
+        <div>
+          <label>Asking price</label>
+          <div class="predicted-price">₹ {{ "{:,.0f}".format(asking_price) }}</div>
+        </div>
+      </div>
+      {% if asking_price > res %}
+        <div class="verdict" style="color: var(--red);">
+          Overpriced by {{ "%.1f"|format(((asking_price - res) / res) * 100) }}% — negotiate down to ₹{{ "{:,.0f}".format(res) }}
+        </div>
+      {% else %}
+        <div class="verdict" style="color: var(--green);">
+          Good deal — {{ "%.1f"|format(((res - asking_price) / res) * 100) }}% below fair market value
+        </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<script>
+  const savedType = "{{ vehicle_type if vehicle_type else '' }}";
+  if (savedType) updateForm(savedType);
+
+  function updateForm(forceType) {
+    const type = forceType || document.getElementById('vehicleType').value;
+    if (forceType) document.getElementById('vehicleType').value = forceType;
+
+    const wrapper = document.getElementById('dynamicFields');
+    wrapper.classList.toggle('hidden', !type);
+
+    document.querySelectorAll('.field-group').forEach(el => el.style.display = 'none');
+    if (type) {
+      const target = document.getElementById('fields_' + type);
+      if (target) target.style.display = 'block';
+    }
+  }
+</script>
+
+{% endblock %}

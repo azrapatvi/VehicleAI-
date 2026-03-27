@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+  .bf-wrapper {
+    max-width: 1100px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+  }
+
+  .bf-header {
+    margin-bottom: 2rem;
+  }
+
+  .bf-header h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+  }
+
+  .bf-header p {
+    font-size: 0.875rem;
+    color: var(--muted);
+    margin-top: 0.25rem;
+  }
+
+  .bf-layout {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .bf-card {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.75rem;
+    background: var(--card);
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-bottom: 0.4rem;
+    margin-top: 1.1rem;
+  }
+
+  .form-group label:first-child { margin-top: 0; }
+
+  .form-group select,
+  .form-group input[type="number"] {
+    width: 100%;
+    padding: 0.65rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--background, #fff);
+    color: var(--text);
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.15s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .form-group select:focus,
+  .form-group input[type="number"]:focus {
+    border-color: var(--primary, #333);
+  }
+
+  button[type="submit"] {
+    margin-top: 1.5rem;
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--primary, #111);
+    color: var(--primary-foreground, #fff);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  button[type="submit"]:hover { opacity: 0.85; }
+
+  .bf-results {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--card);
+    overflow: hidden;
+    min-height: 100px;
+  }
+
+  .bf-layout {
+  display: grid;
+  grid-template-columns: 300px 1.7fr; /* wider results column */
+  gap: 2rem;
+}
+
+.results-table {
+  min-width: 1000px; /* ensures table doesn’t shrink too much */
+  width: 100%;
+}
+  .results-header {
+    padding: 1.1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .results-header h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+
+  .results-count {
+    font-size: 0.75rem;
+    color: var(--muted);
+    background: rgba(0,0,0,0.05);
+    padding: 0.2rem 0.65rem;
+    border-radius: 100px;
+  }
+
+  .results-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    text-align: center;
+    gap: 0.5rem;
+  }
+
+  .results-empty span { font-size: 2rem; opacity: 0.3; }
+  .results-empty p { font-size: 0.82rem; color: var(--muted); max-width: 200px; line-height: 1.6; }
+
+  .bf-error {
+    margin: 1.25rem 1.5rem;
+    padding: 0.75rem 1rem;
+    background: rgba(220,38,38,0.07);
+    border: 1px solid rgba(220,38,38,0.2);
+    border-radius: 8px;
+    font-size: 0.82rem;
+    color: #dc2626;
+  }
+
+  .results-table-wrap { overflow-x: auto; }
+
+  .results-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.83rem;
+  }
+
+  .results-table thead th {
+    padding: 0.7rem 1.25rem;
+    text-align: left;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    background: rgba(0,0,0,0.03);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  .results-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+
+  .results-table tbody tr:last-child { border-bottom: none; }
+  .results-table tbody tr:hover { background: rgba(0,0,0,0.025); }
+
+  .results-table tbody td {
+    padding: 0.8rem 1.25rem;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 750px) {
+    .bf-layout { grid-template-columns: 1fr; }
+  }
+  .results-table-wrap {
+  overflow-x: auto;   /* for horizontal scrolling if table is wide */
+  max-height: 400px;  /* fixed height for vertical scrolling */
+  overflow-y: auto;   /* vertical scroll */
+}
+</style>
+
+<div class="bf-wrapper">
+
+  <div class="bf-header">
+    <h2>Budget Finder</h2>
+    <p>Enter your budget — we'll show every vehicle that fits</p>
+  </div>
+
+  <div class="bf-layout">
+
+    <div class="bf-card">
+      <form id="fairForm" method="POST" action="{{ url_for('budget_finder') }}">
+        <div class="form-group">
+
+          <label>Vehicle type</label>
+          <select name="vehicle_type" id="vehicleType" required>
+  <option value="">Select type</option>
+
+  <optgroup label="── Predict Used Vehicle Price ──">
+    <option value="car"> Used Car</option>
+    <option value="bike"> Used Bike</option>
+  </optgroup>
+
+  <optgroup label="── Predict New EV Price ──">
+    <option value="ev"> New EV</option>
+  </optgroup>
+
+</select>
+
+          <label>Your budget (₹)</label>
+          <input type="number" name="budget" placeholder="e.g. 800000" required>
+
+        </div>
+        <button type="submit">Find Vehicles</button>
+      </form>
+    </div>
+
+    <div class="bf-results">
+      <div class="results-header">
+        <h3>Matching Vehicles</h3>
+        {% if filtered_df is not none %}
+          <span class="results-count">{{ filtered_df | length }} found</span>
+        {% endif %}
+      </div>
+
+      {% if error %}
+        <div class="bf-error">{{ error }}</div>
+      {% endif %}
+
+      {% if filtered_df is not none %}
+        <div class="results-table-wrap">
+          <table class="results-table">
+            <thead>
+              <tr>
+                {% for col in filtered_df.columns %}
+                  <th>{{ col }}</th>
+                {% endfor %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in filtered_df.itertuples() %}
+                <tr>
+                  {% for value in row[1:] %}
+                    <td>{{ value }}</td>
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="results-empty">
+          <span>🔍</span>
+          <p>Select a vehicle type and enter your budget to see results.</p>
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
