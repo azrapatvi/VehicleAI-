@@ -335,4 +335,4 @@ def budget_finder():
 
     return render_template("budget_finder.html", filtered_df=filtered_df, error=error)
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=10000)
